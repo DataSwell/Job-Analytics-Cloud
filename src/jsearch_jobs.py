@@ -1,14 +1,14 @@
 import requests
 import pandas as pd
-import job_credentials
+import job_cloud_creds
 import datetime
-import mongosetup
+import mongo_atlas
 
 
 url = "https://jsearch.p.rapidapi.com/search"
 
 headers = {
-            "X-RapidAPI-Key": f"{job_credentials.rapid_api_key}",
+            "X-RapidAPI-Key": f"{job_cloud_creds.rapid_api_key}",
             "X-RapidAPI-Host": "jsearch.p.rapidapi.com"
         }
 
@@ -74,7 +74,7 @@ print(df_jsearch_jobs_total)
 
 
 # Searching documents from MongoDB for already existing results. Deleting them from the dataframe.
-existing_job_ids = mongosetup.get_jsearch_ids()
+existing_job_ids = mongo_atlas.get_jsearch_ids()
 print(existing_job_ids)
 print(len(existing_job_ids))
 df_jsearch_jobs_total = df_jsearch_jobs_total[~df_jsearch_jobs_total.job_id.isin(existing_job_ids)]
@@ -88,5 +88,5 @@ print(df_jsearch_jobs_total)
 
 # Loading the dataframe jobdetails_total to MongoDB
 jsearch_total_dict = df_jsearch_jobs_total.to_dict('records')
-mongosetup.insert_many_jsearch_jobs(jsearch_total_dict)
+mongo_atlas.insert_many_jsearch_jobs(jsearch_total_dict)
 print('rows uploaded to MongoDB')
