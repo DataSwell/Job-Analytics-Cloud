@@ -81,8 +81,8 @@ df_jsearch_jobs_total = df_jsearch_jobs_total[~df_jsearch_jobs_total.job_id.isin
 
 
 # Saving concated dataframe with all jobdetails
-df_jsearch_jobs_total.to_excel(f'D:/Projekte/Job-Analytics/data/jsearch_jobs/jsearch_jobs_{year()}_{week()}.xlsx', index=False)
-df_jsearch_jobs_total.to_json(f'D:/Projekte/Job-Analytics/data/jsearch_jobs/jsearch_jobs_{year()}_{week()}.json')
+df_jsearch_jobs_total.to_excel(f'D:/Projekte/Job-Analytics-Cloud/data/jsearch_jobs/jsearch_jobs_{year()}_{week()}.xlsx', index=False)
+df_jsearch_jobs_total.to_json(f'D:/Projekte/Job-Analytics-Cloud/data/jsearch_jobs/jsearch_jobs_{year()}_{week()}.json')
 print(df_jsearch_jobs_total)
 
 
