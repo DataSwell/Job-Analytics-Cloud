@@ -1,8 +1,8 @@
 import requests
-import job_credentials
+import job_cloud_creds
 import pandas as pd
 import datetime
-import mongosetup
+import mongo_atlas
 
 
 def week():
@@ -16,8 +16,8 @@ def year():
 
 
 def get_amount_open_jobids():
-    jobsearch_ids = mongosetup.get_jobsearch_ids()
-    jobdetail_ids = mongosetup.get_jobdetails_ids()
+    jobsearch_ids = mongo_atlas.get_jobsearch_ids()
+    jobdetail_ids = mongo_atlas.get_jobdetails_ids()
     s = set(jobdetail_ids)
     open_job_ids = [x for x in jobsearch_ids if x not in s]
     return len(open_job_ids)
@@ -44,7 +44,7 @@ if unused_job_ids <= 30:
     url = "https://glassdoor.p.rapidapi.com/jobs/search"
 
     headers = {
-        "X-RapidAPI-Key": f"{job_credentials.rapid_api_key}",
+        "X-RapidAPI-Key": f"{job_cloud_creds.rapid_api_key}",
         "X-RapidAPI-Host": "glassdoor.p.rapidapi.com"
     }
       
@@ -73,7 +73,7 @@ if unused_job_ids <= 30:
         print(df_extract['id'])
 
         # check which ids already exist in MongoDB
-        mongodb_ids = mongosetup.get_jobsearch_ids()
+        mongodb_ids = mongo_atlas.get_jobsearch_ids()
         print(len(mongodb_ids))
         print(type(mongodb_ids))
 
@@ -104,7 +104,7 @@ if unused_job_ids <= 30:
 
     # Loading the jobsearch_total dataframe to MongoDB
     jobsearch_total_dict = df_jobsearch_total.to_dict('records')
-    mongosetup.insert_many_jobsearch(jobsearch_total_dict)
+    mongo_atlas.insert_many_jobsearch(jobsearch_total_dict)
 
 else:
     print(f'{unused_job_ids} unused job ids left in database')
