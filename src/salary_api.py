@@ -1,8 +1,8 @@
 import datetime
 import requests
-import job_credentials
+import job_cloud_creds
 import pandas as pd
-import mongosetup
+import mongo_atlas
 import time
 
 def week():
@@ -27,7 +27,7 @@ df_salarys = pd.DataFrame()
 # API variables
 url = "https://job-salary-data.p.rapidapi.com/job-salary"
 headers = {
-	"X-RapidAPI-Key": f"{job_credentials.rapid_api_key}",
+	"X-RapidAPI-Key": f"{job_cloud_creds.rapid_api_key}",
 	"X-RapidAPI-Host": "job-salary-data.p.rapidapi.com"
 }
 
@@ -75,5 +75,5 @@ df_salarys.to_json(f'D:/Projekte/Job-Analytics/data/salarys/salarys_{year()}_{we
 
 # Loading the dataframe jobdetails_total to MongoDB
 salarys_dict = df_salarys.to_dict('records')
-mongosetup.insert_many_salarys(salarys_dict)
+mongo_atlas.insert_many_salarys(salarys_dict)
 print('rows uploaded to MongoDB')
