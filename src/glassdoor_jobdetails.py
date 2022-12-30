@@ -76,12 +76,13 @@ for ids in next_job_ids:
 today = datetime.date.today()
 
 df_jobdetails_total.to_excel(
-    f'D:/Projekte/Job-Analytics/data/gd_jobdetails/gd_jobdetails_total_{today}.xlsx', index=False)
+    f'D:/Projekte/Job-Analytics-Cloud/data/gd_jobdetails/gd_jobdetails_total_{today}.xlsx', index=False)
 df_jobdetails_total.to_json(
-    f'D:/Projekte/Job-Analytics/data/gd_jobdetails/gd_jobdetails_total_{today}.json')
+    f'D:/Projekte/Job-Analytics-Cloud/data/gd_jobdetails/gd_jobdetails_total_{today}.json')
 
+count_row = df_jobdetails_total.shape[0] 
 
 # Loading the dataframe jobdetails_total to MongoDB
 jobdetails_total_dict = df_jobdetails_total.to_dict('records')
 mongo_atlas.insert_many_jobdetails(jobdetails_total_dict)
-print('rows uploaded to MongoDB')
+print(f'{count_row} rows uploaded to MongoDB-Atlas cloud')
