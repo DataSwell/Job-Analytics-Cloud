@@ -98,9 +98,9 @@ if unused_job_ids <= 30:
 
     # Saving locally
     df_jobsearch_total.to_excel(
-        f'D:/Projekte/Job-Analytics/data/gd_jobsearch/glassdoor_jobsearch_{year()}_{week()}.xlsx', index=False)
+        f'D:/Projekte/Job-Analytics-Cloud/data/gd_jobsearch/glassdoor_jobsearch_{year()}_{week()}.xlsx', index=False)
     df_jobsearch_total.to_json(
-        f'D:/Projekte/Job-Analytics/data/gd_jobsearch/glassdoor_jobsearch_{year()}_{week()}.json')
+        f'D:/Projekte/Job-Analytics-Cloud/data/gd_jobsearch/glassdoor_jobsearch_{year()}_{week()}.json')
 
     # Loading the jobsearch_total dataframe to MongoDB
     jobsearch_total_dict = df_jobsearch_total.to_dict('records')
