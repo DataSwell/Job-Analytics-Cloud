@@ -69,8 +69,8 @@ print(df_salarys)
 
 
 ### LOADING 
-df_salarys.to_excel(f'D:/Projekte/Job-Analytics/data/salarys/salarys_{year()}_{week()}.xlsx', index=False)
-df_salarys.to_json(f'D:/Projekte/Job-Analytics/data/salarys/salarys_{year()}_{week()}.json')
+df_salarys.to_excel(f'D:/Projekte/Job-Analytics-Cloud/data/salarys/salarys_{year()}_{week()}.xlsx', index=False)
+df_salarys.to_json(f'D:/Projekte/Job-Analytics-Cloud/data/salarys/salarys_{year()}_{week()}.json')
 
 
 # Loading the dataframe jobdetails_total to MongoDB
