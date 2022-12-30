@@ -1,15 +1,15 @@
 import requests
-import job_credentials
+import job_cloud_creds
 import pandas as pd
 import datetime
-import mongosetup
+import mongo_atlas
 
 
 # Select the job_ids from the jobsearch collection which are not in the jobdetails collection
 def get_required_ids():
-    jobsearch_ids = mongosetup.get_jobsearch_ids()
+    jobsearch_ids = mongo_atlas.get_jobsearch_ids()
     print('Jobsearch_ids:\n', jobsearch_ids)
-    jobdetail_ids = mongosetup.get_jobdetails_ids()
+    jobdetail_ids = mongo_atlas.get_jobdetails_ids()
     print('Jobdetail_ids:\n', jobdetail_ids)
 
     s = set(jobdetail_ids)
@@ -31,7 +31,7 @@ for ids in next_job_ids:
     url = f"https://glassdoor.p.rapidapi.com/job/{ids}"
 
     headers = {
-        "X-RapidAPI-Key": f"{job_credentials.rapid_api_key}",
+        "X-RapidAPI-Key": f"{job_cloud_creds.rapid_api_key}",
         "X-RapidAPI-Host": "glassdoor.p.rapidapi.com"
     }
 
@@ -45,7 +45,7 @@ for ids in next_job_ids:
     if response.status_code == 500:
         print(f'jobdetails for id {ids} not available')
         delete_dict = {"id": ids}
-        mongosetup.delete_document_jobsearch(delete_dict)
+        mongo_atlas.delete_document_jobsearch(delete_dict)
         print(f'document for id {ids} is deleted from the jobsearch collection')
     else:
         res_json = response.json()
@@ -83,5 +83,5 @@ df_jobdetails_total.to_json(
 
 # Loading the dataframe jobdetails_total to MongoDB
 jobdetails_total_dict = df_jobdetails_total.to_dict('records')
-mongosetup.insert_many_jobdetails(jobdetails_total_dict)
+mongo_atlas.insert_many_jobdetails(jobdetails_total_dict)
 print('rows uploaded to MongoDB')
