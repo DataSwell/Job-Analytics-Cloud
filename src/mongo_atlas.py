@@ -2,7 +2,7 @@ import pymongo
 import pymongo.errors
 import job_cloud_creds
 
-
+# Connection string to Atlas Cloud
 conn_str = f"mongodb+srv://DataSwell:{job_cloud_creds.atlas_pw}@dataswellmongo.h60y77k.mongodb.net/test"
 
 myclient = pymongo.MongoClient(conn_str, serverSelectionTimeoutMS=5000)
