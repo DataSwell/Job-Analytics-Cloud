@@ -29,82 +29,91 @@ def check_mongo_and_extract_ids(extract_ids_list, mongo_ids_list):
     return missing_ids
 
 
-# Check if there are 30 or less unused job_ids in the jobsearch collection
-# if this is true we want to extract 5 new pages of job_ids
-unused_job_ids = get_amount_open_jobids()
-print(unused_job_ids)
+# Test if the connection to the MongoDB Atlas Server is working
+conn_status = mongo_atlas.conn_test
+print(conn_status)
 
-if unused_job_ids <= 30:
+if conn_status == False:
+    print("Unable to connect to the server.")
+else:
 
-    df_jobsearch_total = pd.DataFrame()
-    next_page_cursor = ''
-    next_page_id = '0'
-    pages = 0
+    # Check if there are 30 or less unused job_ids in the jobsearch collection
+    # if this is true we want to extract 5 new pages of job_ids
+    unused_job_ids = get_amount_open_jobids()
+    print(unused_job_ids)
 
-    url = "https://glassdoor.p.rapidapi.com/jobs/search"
+    if unused_job_ids <= 30:
 
-    headers = {
-        "X-RapidAPI-Key": f"{job_cloud_creds.rapid_api_key}",
-        "X-RapidAPI-Host": "glassdoor.p.rapidapi.com"
-    }
-      
-     # While loop to extract 5 pages (150 job_ids)   
-    while pages < 5:
+        df_jobsearch_total = pd.DataFrame()
+        next_page_cursor = ''
+        next_page_id = '0'
+        pages = 0
 
-        # querystring must be in the while loop, because otherise the next_page_cursor and next_page_id will be updated, but not the querystrng variable
-        # if the querystring is outside the requests will be done with the old cursor and id which are loaded by starting the script
-        querystring = {
-            "keyword": "Data Engineer",
-            "location_id": "96", "location_type": "N",
-            "page_id": f"{next_page_id}",
-            "page_cursor": f"{next_page_cursor}"
+        url = "https://glassdoor.p.rapidapi.com/jobs/search"
+
+        headers = {
+            "X-RapidAPI-Key": f"{job_cloud_creds.rapid_api_key}",
+            "X-RapidAPI-Host": "glassdoor.p.rapidapi.com"
         }
 
-        print(querystring)
-        response = requests.request(
-            "GET", url, headers=headers, params=querystring)
+        # While loop to extract 5 pages (150 job_ids)
+        while pages < 5:
 
-        print(type(response))
-        res_json = response.json()
+            # querystring must be in the while loop, because otherise the next_page_cursor and next_page_id will be updated, but not the querystrng variable
+            # if the querystring is outside the requests will be done with the old cursor and id which are loaded by starting the script
+            querystring = {
+                "keyword": "Data Engineer",
+                "location_id": "96", "location_type": "N",
+                "page_id": f"{next_page_id}",
+                "page_cursor": f"{next_page_cursor}"
+            }
 
-        df_extract = pd.DataFrame(res_json['hits'])
-        print(df_extract)
-        print(len(df_extract.index))
-        print(df_extract['id'])
+            print(querystring)
+            response = requests.request(
+                "GET", url, headers=headers, params=querystring)
 
-        # check which ids already exist in MongoDB
-        mongodb_ids = mongo_atlas.get_jobsearch_ids()
-        print(len(mongodb_ids))
-        print(type(mongodb_ids))
+            print(type(response))
+            res_json = response.json()
 
-        # drop rows with ids that already exist in MongoDB
-        # using the isin() function combined with the NOT operator ~
-        df_extract = df_extract[~(df_extract.id.isin(mongodb_ids))]
-        print(df_extract)
-        print(len(df_extract.index))
+            df_extract = pd.DataFrame(res_json['hits'])
+            print(df_extract)
+            print(len(df_extract.index))
+            print(df_extract['id'])
 
-        # concat the extract of this page to the total results dataframe
-        df_jobsearch_total = pd.concat(
-            [df_jobsearch_total, df_extract], axis=0, ignore_index=True)
+            # check which ids already exist in MongoDB
+            mongodb_ids = mongo_atlas.get_jobsearch_ids()
+            print(len(mongodb_ids))
+            print(type(mongodb_ids))
 
-        # saving the next page cursor and id for the for loop
-        next_page_cursor = res_json['next_page']['next_page_cursor']
-        print(next_page_cursor)
-        next_page_id = res_json['next_page']['next_page_id']
-        print(next_page_id)
-        pages += 1
-        print(pages)
+            # drop rows with ids that already exist in MongoDB
+            # using the isin() function combined with the NOT operator ~
+            df_extract = df_extract[~(df_extract.id.isin(mongodb_ids))]
+            print(df_extract)
+            print(len(df_extract.index))
 
+            # concat the extract of this page to the total results dataframe
+            df_jobsearch_total = pd.concat(
+                [df_jobsearch_total, df_extract], axis=0, ignore_index=True)
 
-    # Saving locally
-    df_jobsearch_total.to_excel(
-        f'D:/Projekte/Job-Analytics-Cloud/data/gd_jobsearch/glassdoor_jobsearch_{year()}_{week()}.xlsx', index=False)
-    df_jobsearch_total.to_json(
-        f'D:/Projekte/Job-Analytics-Cloud/data/gd_jobsearch/glassdoor_jobsearch_{year()}_{week()}.json')
+            # saving the next page cursor and id for the for loop
+            next_page_cursor = res_json['next_page']['next_page_cursor']
+            print(next_page_cursor)
+            next_page_id = res_json['next_page']['next_page_id']
+            print(next_page_id)
+            pages += 1
+            print(pages)
 
-    # Loading the jobsearch_total dataframe to MongoDB
-    jobsearch_total_dict = df_jobsearch_total.to_dict('records')
-    mongo_atlas.insert_many_jobsearch(jobsearch_total_dict)
+        # Saving locally
+        df_jobsearch_total.to_excel(
+            f'D:/Projekte/Job-Analytics-Cloud/data/gd_jobsearch/glassdoor_jobsearch_{year()}_{week()}.xlsx', index=False)
+        df_jobsearch_total.to_json(
+            f'D:/Projekte/Job-Analytics-Cloud/data/gd_jobsearch/glassdoor_jobsearch_{year()}_{week()}.json')
 
-else:
-    print(f'{unused_job_ids} unused job ids left in database')
+        # Loading the jobsearch_total dataframe to MongoDB
+        jobsearch_total_dict = df_jobsearch_total.to_dict('records')
+        mongo_atlas.insert_many_jobsearch(jobsearch_total_dict)
+
+        print(f'{len(df_jobsearch_total.index)} new job-IDs insert in MongoDB')
+
+    else:
+        print(f'{unused_job_ids} unused job ids left in database')
