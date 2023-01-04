@@ -7,12 +7,6 @@ conn_str = f"mongodb+srv://DataSwell:{job_cloud_creds.atlas_pw}@dataswellmongo.h
 
 myclient = pymongo.MongoClient(conn_str, serverSelectionTimeoutMS=5000)
 
-try:
-    print(myclient.server_info())
-except Exception:
-    print("Unable to connect to the server.")
-
-
 mydb = myclient["job_analytics"]
 col_jobsearch = mydb["glassdoor_job_ids"]
 col_jobdetails = mydb["glassdoor_jobdetails"]
@@ -21,6 +15,14 @@ col_salarys = mydb["salarys"]
 
 
 # Database functions
+def conn_test():
+    try:
+        print(myclient.server_info())
+        return True
+    except Exception:
+        return False
+
+
 def insert_many_jobsearch(input):
     try:
         x = col_jobsearch.insert_many(input)
