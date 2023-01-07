@@ -88,9 +88,17 @@ def get_jobdetails_ids():
     ids = col_jobdetails.distinct('job_id')
     return ids
 
+def get_jobdetails_description():
+    desc = col_jobdetails.find()
+    return desc
+
 def get_jsearch_ids():
     ids = col_jsearch_jobs.distinct('job_id')
     return ids
+
+def get_jsearch_descriptions():
+    desc = col_jsearch_jobs('job_description')
+    return desc
 
 def delete_document_jobdetails(key_value_dict):
     try:
