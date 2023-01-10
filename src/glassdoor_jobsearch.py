@@ -42,12 +42,13 @@ else:
     unused_job_ids = get_amount_open_jobids()
     print(unused_job_ids)
 
-    if unused_job_ids <= 30:
+    if unused_job_ids <= 40:
 
         df_jobsearch_total = pd.DataFrame()
         next_page_cursor = ''
         next_page_id = '0'
         pages = 0
+        job_titles = ['Data Engineer', 'Analytics Engineer']
 
         url = "https://glassdoor.p.rapidapi.com/jobs/search"
 
@@ -56,52 +57,53 @@ else:
             "X-RapidAPI-Host": "glassdoor.p.rapidapi.com"
         }
 
-        # While loop to extract 5 pages (150 job_ids)
-        while pages < 5:
+        for job in job_titles:
+            # While loop to extract 5 pages (150 job_ids)
+            while pages < 5:
 
-            # querystring must be in the while loop, because otherise the next_page_cursor and next_page_id will be updated, but not the querystrng variable
-            # if the querystring is outside the requests will be done with the old cursor and id which are loaded by starting the script
-            querystring = {
-                "keyword": "Data Engineer",
-                "location_id": "96", "location_type": "N",
-                "page_id": f"{next_page_id}",
-                "page_cursor": f"{next_page_cursor}"
-            }
+                # querystring must be in the while loop, because otherise the next_page_cursor and next_page_id will be updated, but not the querystrng variable
+                # if the querystring is outside the requests will be done with the old cursor and id which are loaded by starting the script
+                querystring = {
+                    "keyword": f"{job}",
+                    "location_id": "96", "location_type": "N",
+                    "page_id": f"{next_page_id}",
+                    "page_cursor": f"{next_page_cursor}"
+                }
 
-            print(querystring)
-            response = requests.request(
-                "GET", url, headers=headers, params=querystring)
+                print(querystring)
+                response = requests.request(
+                    "GET", url, headers=headers, params=querystring)
 
-            print(type(response))
-            res_json = response.json()
+                print(type(response))
+                res_json = response.json()
 
-            df_extract = pd.DataFrame(res_json['hits'])
-            print(df_extract)
-            print(len(df_extract.index))
-            print(df_extract['id'])
+                df_extract = pd.DataFrame(res_json['hits'])
+                print(df_extract)
+                print(len(df_extract.index))
+                print(df_extract['id'])
 
-            # check which ids already exist in MongoDB
-            mongodb_ids = mongo_atlas.get_jobsearch_ids()
-            print(len(mongodb_ids))
-            print(type(mongodb_ids))
+                # check which ids already exist in MongoDB
+                mongodb_ids = mongo_atlas.get_jobsearch_ids()
+                print(len(mongodb_ids))
+                print(type(mongodb_ids))
 
-            # drop rows with ids that already exist in MongoDB
-            # using the isin() function combined with the NOT operator ~
-            df_extract = df_extract[~(df_extract.id.isin(mongodb_ids))]
-            print(df_extract)
-            print(len(df_extract.index))
+                # drop rows with ids that already exist in MongoDB
+                # using the isin() function combined with the NOT operator ~
+                df_extract = df_extract[~(df_extract.id.isin(mongodb_ids))]
+                print(df_extract)
+                print(len(df_extract.index))
 
-            # concat the extract of this page to the total results dataframe
-            df_jobsearch_total = pd.concat(
-                [df_jobsearch_total, df_extract], axis=0, ignore_index=True)
+                # concat the extract of this page to the total results dataframe
+                df_jobsearch_total = pd.concat(
+                    [df_jobsearch_total, df_extract], axis=0, ignore_index=True)
 
-            # saving the next page cursor and id for the for loop
-            next_page_cursor = res_json['next_page']['next_page_cursor']
-            print(next_page_cursor)
-            next_page_id = res_json['next_page']['next_page_id']
-            print(next_page_id)
-            pages += 1
-            print(pages)
+                # saving the next page cursor and id for the for loop
+                next_page_cursor = res_json['next_page']['next_page_cursor']
+                print(next_page_cursor)
+                next_page_id = res_json['next_page']['next_page_id']
+                print(next_page_id)
+                pages += 1
+                print(pages)
 
         # Saving locally
         df_jobsearch_total.to_excel(
