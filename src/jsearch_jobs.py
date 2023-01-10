@@ -95,6 +95,7 @@ else:
 
 
     # Loading the dataframe jobdetails_total to MongoDB
+    length_df = len(df_jsearch_jobs_total.index)
     jsearch_total_dict = df_jsearch_jobs_total.to_dict('records')
     mongo_atlas.insert_many_jsearch_jobs(jsearch_total_dict)
-    print('rows uploaded to MongoDB')
+    print(f'{length_df} rows uploaded to MongoDB')
