@@ -86,6 +86,7 @@ else:
         f'D:/Projekte/Job-Analytics-Cloud/data/salarys/salarys_{year()}_{week()}.json')
 
     # Loading the dataframe jobdetails_total to MongoDB
+    length_df = len(df_salarys.index)
     salarys_dict = df_salarys.to_dict('records')
     mongo_atlas.insert_many_salarys(salarys_dict)
-    print('rows uploaded to MongoDB')
+    print(f'{length_df} rows uploaded to MongoDB')
