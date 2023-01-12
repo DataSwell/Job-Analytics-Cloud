@@ -32,8 +32,8 @@ else:
 
     # API request for next 10 job details
     # for each job ID in the list next_job_ids we will query the jobdetails, transform the response and save the response to the total dataframe
-    for ids in next_job_ids:
-        url = f"https://glassdoor.p.rapidapi.com/job/{ids}"
+    for id in next_job_ids:
+        url = f"https://glassdoor.p.rapidapi.com/job/{id}"
 
         headers = {
             "X-RapidAPI-Key": f"{job_cloud_creds.rapid_api_key}",
@@ -48,11 +48,11 @@ else:
         print(type(response.status_code))
 
         if response.status_code == 500:
-            print(f'jobdetails for id {ids} not available')
-            delete_dict = {"id": ids}
+            print(f'jobdetails for id {id} not available')
+            delete_dict = {"id": id}
             mongo_atlas.delete_document_jobsearch(delete_dict)
             print(
-                f'document for id {ids} is deleted from the jobsearch collection')
+                f'document for id {id} is deleted from the jobsearch collection')
         else:
             res_json = response.json()
             print(res_json)
@@ -61,7 +61,7 @@ else:
             # if we don´t transform the response we can´t load it properly in a dataframe
             # the first key:value par (company) contains the company details, we only want
             transformed_dict = {
-                "job_id": ids,
+                "job_id": id,
                 "company_name": res_json['company']['name'],
                 "company_id": res_json['company']['id'],
                 "creation_date": res_json['creation_date'],
