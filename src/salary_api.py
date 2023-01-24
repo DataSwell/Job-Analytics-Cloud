@@ -64,13 +64,13 @@ else:
             # adding the city, state and the searched jobtitle to the response dataframe
             df_extract['city'] = f'{city}'
             df_extract['state'] = city_state[state_list_index]
-            df_salarys['searched_title'] = job
+            df_salarys['searched_title'] = f'{job}'
             state_list_index += 1
 
             df_salarys = pd.concat(
                 [df_salarys, df_extract], axis=0, ignore_index=True)
 
-            time.sleep(3)
+            time.sleep(2)
 
     # TRANSFORM the global dataframe
     df_salarys.drop('publisher_link', axis=1)
