@@ -5,7 +5,7 @@ import job_cloud_creds
 # Connection string to Atlas Cloud
 conn_str = f"mongodb+srv://DataSwell:{job_cloud_creds.atlas_pw}@dataswellmongo.h60y77k.mongodb.net/test"
 
-myclient = pymongo.MongoClient(conn_str, serverSelectionTimeoutMS=5000)
+myclient = pymongo.MongoClient(conn_str, serverSelectionTimeoutMS=10000)
 
 mydb = myclient["job_analytics"]
 col_jobsearch = mydb["glassdoor_job_ids"]
@@ -88,8 +88,8 @@ def get_jobdetails_ids():
     ids = col_jobdetails.distinct('job_id')
     return ids
 
-def get_jobdetails_description():
-    desc = col_jobdetails.find()
+def get_jobdetails_description(field, value):
+    desc = col_jobdetails.find({f'{field}':f'/{value}/'})
     return desc
 
 def get_jsearch_ids():
@@ -112,3 +112,4 @@ def delete_document_jobsearch(key_value_dict):
         col_jobsearch.delete_one(key_value_dict)
     except pymongo.errors as e:
         print(e)
+
