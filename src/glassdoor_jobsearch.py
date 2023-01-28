@@ -48,7 +48,7 @@ else:
         next_page_cursor = ''
         next_page_id = '0'
         pages = 0
-        job_titles = ['Data Engineer', 'Analytics Engineer', 'Data Warehouse', 'Business Intelligence']
+        job_titles = ['Data Engineer', 'Analytics Engineer', 'Data Warehouse', 'Business Intelligence Developer']
 
         url = "https://glassdoor.p.rapidapi.com/jobs/search"
 
