@@ -42,12 +42,12 @@ else:
     unused_job_ids = get_amount_open_jobids()
     print(unused_job_ids)
 
-    if unused_job_ids <= 40:
+    if unused_job_ids <= 100:
 
         df_jobsearch_total = pd.DataFrame()
         next_page_cursor = ''
         next_page_id = '0'
-        pages = 0
+        
         job_titles = ['Data Engineer', 'Analytics Engineer', 'Data Warehouse', 'Business Intelligence Developer']
 
         url = "https://glassdoor.p.rapidapi.com/jobs/search"
@@ -58,6 +58,8 @@ else:
         }
 
         for job in job_titles:
+
+            pages = 0
             # While loop to extract 5 pages (150 job_ids)
             while pages < 5:
 
@@ -84,14 +86,12 @@ else:
 
                 # check which ids already exist in MongoDB
                 mongodb_ids = mongo_atlas.get_jobsearch_ids()
-                print(len(mongodb_ids))
-                print(type(mongodb_ids))
-
+                
                 # drop rows with ids that already exist in MongoDB
                 # using the isin() function combined with the NOT operator ~
                 df_extract = df_extract[~(df_extract.id.isin(mongodb_ids))]
                 print(df_extract)
-                print(len(df_extract.index))
+              
 
                 # concat the extract of this page to the total results dataframe
                 df_jobsearch_total = pd.concat(
