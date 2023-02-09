@@ -1,0 +1,20 @@
+SQL, NoSQL
+Python, Java, Scala,
+ETL, ELT, Pipeline
+
+Postgres, MySQL, Oracle, MS-SQL
+AWS, GCP, BigQuery, Azure, Snowflake, Databricks
+dbt
+Airbyte, Stitch, Fivetran
+
+Power BI, Tableau, Looker, Qlik, Excel
+Data... Analytics, Warehousing, Modeling, Visualization, Documentation
+
+Data Vault, Kimball, Inmon, Star, Snowflake, normalized, denormalized, fact, dimension, 3NF
+
+
+Git, Docker, Airflow
+CI/CD
+Unit Testing
+Requirements Engineering
+Machine Learning
